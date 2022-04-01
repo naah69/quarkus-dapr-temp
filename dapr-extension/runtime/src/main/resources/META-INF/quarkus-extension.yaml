@@ -1,0 +1,11 @@
+name: Dapr Extension
+description: Dapr Extension ...
+metadata:
+  keywords:
+    - dapr
+    - multi-runtime
+    - sidecar
+#  guide: ...
+  categories:
+    - "sidecar"
+  status: "preview"
