@@ -1,9 +1,9 @@
 package org.jboss.resteasy.client.jaxrs.engines.dapr;
 
-import io.dapr.client.DaprClientHttp;
 import io.dapr.client.DaprHttp;
 import io.dapr.client.domain.HttpExtension;
 import io.dapr.client.domain.InvokeMethodRequest;
+import io.dapr.utils.TypeRef;
 import io.quarkiverse.dapr.core.SyncDaprClient;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.jboss.resteasy.client.jaxrs.engines.HttpContextProvider;
@@ -32,6 +32,8 @@ import java.security.AccessController;
 import java.security.PrivilegedAction;
 import java.security.PrivilegedActionException;
 import java.security.PrivilegedExceptionAction;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -224,7 +226,7 @@ public class ManualClosingDaprClientEngine implements DaprClientEngine {
 
     public static CaseInsensitiveMap<String> extractHeaders(DaprHttp.Response response) {
         final CaseInsensitiveMap<String> headers = new CaseInsensitiveMap<String>();
-        headers.putAll(response.getHeaders());
+        response.getHeaders().entrySet().forEach(e->headers.add(e.getKey(),e.getValue()));
         return headers;
     }
 
@@ -247,8 +249,7 @@ public class ManualClosingDaprClientEngine implements DaprClientEngine {
         final DaprHttp.Response res;
         try {
             loadHttpMethod(request, daprRequest);
-
-            res = daprClient.invokeMethod(daprRequest, DaprClientHttp.RESPONSE_TYPE);
+            res = daprClient.invokeMethod(daprRequest,TypeRef.get(DaprHttp.Response.class));
         } catch (Exception e) {
             LogMessages.LOGGER.clientSendProcessingFailure(e);
             throw new ProcessingException(Messages.MESSAGES.unableToInvokeRequest(e.toString()), e);
@@ -329,10 +330,13 @@ public class ManualClosingDaprClientEngine implements DaprClientEngine {
 
         MultivaluedMap<String, String> query = buildQuery(request);
 
+        Map<String, String> daprHeaders=new HashMap<>();
+        headers.forEach((k,v)->daprHeaders.put(k,v.get(0)));
+
         HttpExtension httpExtension = new HttpExtension(
                 DaprHttp.HttpMethods.valueOf(request.getMethod()),
                 query,
-                headers);
+                daprHeaders);
         httpRequest.setHttpExtension(httpExtension);
     }
 
