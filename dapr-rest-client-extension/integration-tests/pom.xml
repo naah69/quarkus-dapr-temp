@@ -70,6 +70,9 @@
       </activation>
       <properties>
         <quarkus.package.type>native</quarkus.package.type>
+        <quarkus.native.additional-build-args>
+          --trace-class-initialization=io.netty.util.concurrent.ScheduledFutureTask
+        </quarkus.native.additional-build-args>
       </properties>
       <build>
         <plugins>

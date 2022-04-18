@@ -11,6 +11,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.dapr.Topic;
+import io.dapr.actors.runtime.ActorRuntimeConfig;
+import io.quarkiverse.dapr.core.DaprTopicSubscription;
 import io.quarkiverse.dapr.endpoint.actor.ActorDeactivateHandler;
 import io.quarkiverse.dapr.endpoint.actor.ActorInvokeMethodHandler;
 import io.quarkiverse.dapr.endpoint.actor.ActorInvokeReminderHandler;
@@ -18,6 +20,7 @@ import io.quarkiverse.dapr.endpoint.actor.ActorInvokeTimerHandler;
 import io.quarkiverse.dapr.endpoint.dapr.AbstractDaprHandler;
 import io.quarkiverse.dapr.endpoint.dapr.DaprConfigHandler;
 import io.quarkiverse.dapr.endpoint.dapr.DaprSubscribeHandler;
+import io.quarkiverse.dapr.jackson.DaprJacksonModuleCustomizer;
 import io.quarkiverse.dapr.runtime.DaprProducer;
 import io.quarkiverse.dapr.runtime.DaprRuntimeRecorder;
 import io.quarkus.arc.deployment.AdditionalBeanBuildItem;
@@ -27,6 +30,7 @@ import io.quarkus.deployment.annotations.ExecutionTime;
 import io.quarkus.deployment.annotations.Record;
 import io.quarkus.deployment.builditem.CombinedIndexBuildItem;
 import io.quarkus.deployment.builditem.FeatureBuildItem;
+import io.quarkus.deployment.builditem.nativeimage.ReflectiveClassBuildItem;
 import io.quarkus.vertx.http.deployment.NonApplicationRootPathBuildItem;
 import io.quarkus.vertx.http.deployment.RouteBuildItem;
 
@@ -79,6 +83,7 @@ class DaprExtensionProcessor {
     @BuildStep
     void additionalBeans(BuildProducer<AdditionalBeanBuildItem> additionalBeans) {
         additionalBeans.produce(AdditionalBeanBuildItem.unremovableOf(DaprProducer.class));
+        additionalBeans.produce(AdditionalBeanBuildItem.unremovableOf(DaprJacksonModuleCustomizer.class));
     }
 
     @BuildStep
@@ -164,6 +169,13 @@ class DaprExtensionProcessor {
                 .handler(handler)
                 .displayOnNotFoundPage()
                 .build();
+    }
+
+    @BuildStep
+    void reflectiveClasses(BuildProducer<ReflectiveClassBuildItem> reflectiveClassBuildProducer) {
+        reflectiveClassBuildProducer.produce(new ReflectiveClassBuildItem(true, true,
+                DaprTopicSubscription.class,
+                ActorRuntimeConfig.class));
     }
 
 }

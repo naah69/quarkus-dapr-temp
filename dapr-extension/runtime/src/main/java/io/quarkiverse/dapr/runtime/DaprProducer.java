@@ -2,11 +2,14 @@ package io.quarkiverse.dapr.runtime;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
+import javax.inject.Singleton;
 
 import io.dapr.client.DaprClient;
-import io.quarkiverse.dapr.core.DaprClientManager;
+import io.dapr.client.DaprClientBuilder;
 import io.quarkiverse.dapr.core.SyncDaprClient;
-import io.quarkiverse.dapr.core.SyncDaprClientManager;
+import io.quarkus.arc.DefaultBean;
+import io.quarkus.arc.Unremovable;
+import io.quarkus.runtime.Startup;
 
 /**
  * DaprProducer
@@ -18,14 +21,20 @@ import io.quarkiverse.dapr.core.SyncDaprClientManager;
 public class DaprProducer {
 
     @Produces
-    @ApplicationScoped
+    @DefaultBean
+    @Startup
+    @Singleton
+    @Unremovable
     public DaprClient daprClient() {
-        return DaprClientManager.getInstance();
+        return new DaprClientBuilder().build();
     }
 
     @Produces
-    @ApplicationScoped
-    public SyncDaprClient syncDaprClient() {
-        return SyncDaprClientManager.getInstance();
+    @DefaultBean
+    @Startup
+    @Singleton
+    @Unremovable
+    public SyncDaprClient syncDaprClient(DaprClient client) {
+        return new SyncDaprClient(client);
     }
 }

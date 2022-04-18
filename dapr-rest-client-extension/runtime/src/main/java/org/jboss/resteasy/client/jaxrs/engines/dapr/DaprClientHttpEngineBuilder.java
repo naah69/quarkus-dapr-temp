@@ -1,10 +1,11 @@
 package org.jboss.resteasy.client.jaxrs.engines.dapr;
 
+import io.quarkiverse.dapr.core.SyncDaprClient;
 import org.jboss.resteasy.client.jaxrs.ClientHttpEngine;
 import org.jboss.resteasy.client.jaxrs.ClientHttpEngineBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 
-import io.quarkiverse.dapr.core.SyncDaprClientManager;
+import javax.enterprise.inject.spi.CDI;
 
 /**
  * DaprClientHttpEngineBuilder
@@ -27,7 +28,7 @@ public class DaprClientHttpEngineBuilder implements ClientHttpEngineBuilder {
 
         try {
             // this may be null.  We can't really support this with Apache Client.
-            return new DefaultDaprClientEngine(SyncDaprClientManager.getInstance(), true);
+            return new DefaultDaprClientEngine(CDI.current().select(SyncDaprClient.class).get(), true);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

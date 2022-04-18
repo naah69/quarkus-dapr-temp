@@ -1,24 +1,10 @@
 package org.jboss.resteasy.client.jaxrs.engines.dapr;
 
-import java.io.*;
-import java.lang.management.ManagementFactory;
-import java.net.URI;
-import java.security.AccessController;
-import java.security.PrivilegedAction;
-import java.security.PrivilegedActionException;
-import java.security.PrivilegedExceptionAction;
-import java.util.Objects;
-import java.util.Optional;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
-
+import io.dapr.client.DaprClientHttp;
+import io.dapr.client.DaprHttp;
+import io.dapr.client.domain.HttpExtension;
+import io.dapr.client.domain.InvokeMethodRequest;
+import io.quarkiverse.dapr.core.SyncDaprClient;
 import org.apache.commons.io.output.DeferredFileOutputStream;
 import org.jboss.resteasy.client.jaxrs.engines.HttpContextProvider;
 import org.jboss.resteasy.client.jaxrs.engines.SelfExpandingBufferredInputStream;
@@ -30,12 +16,24 @@ import org.jboss.resteasy.client.jaxrs.internal.FinalizedClientResponse;
 import org.jboss.resteasy.spi.config.ConfigurationFactory;
 import org.jboss.resteasy.util.CaseInsensitiveMap;
 
-import io.dapr.client.DaprClientHttp;
-import io.dapr.client.DaprHttp;
-import io.dapr.client.domain.HttpExtension;
-import io.dapr.client.domain.InvokeMethodRequest;
-import io.quarkiverse.dapr.core.SyncDaprClient;
-import io.quarkiverse.dapr.core.SyncDaprClientManager;
+import javax.enterprise.inject.spi.CDI;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.ProcessingException;
+import javax.ws.rs.client.Invocation;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import java.io.*;
+import java.lang.management.ManagementFactory;
+import java.net.URI;
+import java.security.AccessController;
+import java.security.PrivilegedAction;
+import java.security.PrivilegedActionException;
+import java.security.PrivilegedExceptionAction;
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * DaprClientHttpEngineBuilder
@@ -133,7 +131,7 @@ public class ManualClosingDaprClientEngine implements DaprClientEngine {
 
     private ManualClosingDaprClientEngine(final SyncDaprClient httpClient,
             final HttpContextProvider httpContextProvider, final boolean closeHttpClient) {
-        this.daprClient = httpClient != null ? httpClient : SyncDaprClientManager.getInstance();
+        this.daprClient = httpClient != null ? httpClient : CDI.current().select(SyncDaprClient.class).get();
         if (closeHttpClient && !(this.daprClient instanceof AutoCloseable)) {
             throw new IllegalArgumentException(
                     "httpClient must be a CloseableHttpClient instance in order for allowing engine to close it!");

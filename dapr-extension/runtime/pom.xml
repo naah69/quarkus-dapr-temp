@@ -21,11 +21,33 @@
     </dependency>
     <dependency>
       <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-grpc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-netty</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.quarkus</groupId>
       <artifactId>quarkus-resteasy-jackson</artifactId>
     </dependency>
     <dependency>
       <groupId>io.dapr</groupId>
       <artifactId>dapr-sdk</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>grpc-netty-shaded</artifactId>
+          <groupId>io.grpc</groupId>
+        </exclusion>
+<!--        <exclusion>-->
+<!--          <artifactId>grpc-protobuf</artifactId>-->
+<!--          <groupId>io.grpc</groupId>-->
+<!--        </exclusion>-->
+<!--        <exclusion>-->
+<!--          <artifactId>grpc-stub</artifactId>-->
+<!--          <groupId>io.grpc</groupId>-->
+<!--        </exclusion>-->
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>io.dapr</groupId>
