@@ -1,4 +1,4 @@
-package io.quarkus.restclient.runtime;
+package io.quarkus.dapr.restclient.runtime;
 
 import static org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder.PROPERTY_PROXY_HOST;
 import static org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder.PROPERTY_PROXY_PORT;
@@ -91,11 +91,11 @@ import io.quarkus.runtime.ssl.SslContextConfiguration;
  * This is mostly a copy from {@link org.jboss.resteasy.microprofile.client.RestClientBuilderImpl}. It is required to
  * remove the reference to org.jboss.resteasy.cdi.CdiInjectorFactory so we don't require the RESTEasy CDI dependency.
  */
-public class QuarkusRestClientBuilder implements RestClientBuilder {
+public class DaprRestClientBuilder implements RestClientBuilder {
     private static final String RESTEASY_PROPERTY_PREFIX = "resteasy.";
 
     private static final String DEFAULT_MAPPER_PROP = "microprofile.rest.client.disable.default.mapper";
-    private static final Logger LOGGER = Logger.getLogger(QuarkusRestClientBuilder.class);
+    private static final Logger LOGGER = Logger.getLogger(DaprRestClientBuilder.class);
     private static final DefaultMediaTypeFilter DEFAULT_MEDIA_TYPE_FILTER = new DefaultMediaTypeFilter();
     private static final String TLS_TRUST_ALL = "quarkus.tls.trust-all";
 
@@ -108,7 +108,7 @@ public class QuarkusRestClientBuilder implements RestClientBuilder {
         PROVIDER_FACTORY = providerFactory;
     }
 
-    public QuarkusRestClientBuilder() {
+    public DaprRestClientBuilder() {
         builderDelegate = new MpClientBuilderImpl();
 
         if (PROVIDER_FACTORY != null) {
